@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+	<html>
+	<head>
+		<title> Live Text Sharing</title>
+		<meta charset='UTF-8' name="viewport" content="width=device-width, initial-scale=1.0">
+		<script type='text/javascript' src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+		<link href="bootstrap.min.css" rel="stylesheet" media="screen">
+	</head>
+	<body>
+		<script type="text/javascript">
+		var conn;
+		var peer = new Peer({key: '5nyu3ci7jomq85mi'});
+		peer.on('open', function(id){
+			$('#mid').text(id);
+		});
+
+		$(document).ready(function(){
+			$('#connect').click(function(){
+				$('#progBar').width('100%');
+				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+				navigator.getUserMedia({video: true, audio: true}, function(stream) {
+					  var call = peer.call($('#mid').val(), stream);
+					  call.on('stream', function(remoteStream) {
+					    // Show stream in some <video> element.
+					  });
+				}, function(err) {
+					  console.log('Failed to get local stream' ,err);
+					});
+
+			});
+		});
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		peer.on('call', function(call) {
+		  navigator.getUserMedia({video: true, audio: true}, function(stream) {
+		    call.answer(stream); // Answer the call with an A/V stream.
+		    call.on('stream', function(remoteStream) {
+		      // Show stream in some <video> element.
+		    });
+		  }, function(err) {
+		     console.log('Failed to get local stream' ,err);
+		  });
+		});
+
+
+		</script>
+	<h2> Video chat</h2>
+	your peerJs id is: <span id='mid'></span><br>
+	<input id='pid' placeholder='your peer id'></input>
+	<input id='connect' value='Connect' type='button'></input>
+	<div class="progress progress-striped active" style='width: 25%;'>
+		  <div class="progress-bar progress-bar-success" id='progBar' style="width: 0%;">
+			</div>
+	</div>
+
+
+	<video height='320px' height='320px' id="localVideo" autoplay></video>
